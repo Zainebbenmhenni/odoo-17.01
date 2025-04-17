@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- My Travel Dashboard -->
+    <template id="my_travel_dashboard" name="My Travel Dashboard">
+        <t t-call="website.layout">
+            <div class="container mt-4 mb-5">
+                <div class="row">
+                    <div class="col-12">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/">Accueil</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Mon Espace Voyageur</li>
+                            </ol>
+                        </nav>
+
+                        <h1 class="mb-4">Bienvenue, <t t-esc="partner.name"/></h1>
+
+                        <div class="row mb-4">
+                            <div class="col-lg-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fa fa-user fa-3x mb-3 text-primary"></i>
+                                        <h5 class="card-title">Mon Profil</h5>
+                                        <p class="card-text">Gérez vos informations personnelles</p>
+                                        <a href="/my/profile" class="btn btn-outline-primary">Voir mon profil</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fa fa-plane fa-3x mb-3 text-primary"></i>
+                                        <h5 class="card-title">Mes Réservations</h5>
+                                        <p class="card-text">Consultez vos réservations de vol</p>
+                                        <a href="#mes-reservations" class="btn btn-outline-primary">Voir mes réservations</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fa fa-ticket fa-3x mb-3 text-primary"></i>
+                                        <h5 class="card-title">Mes Billets</h5>
+                                        <p class="card-text">Accédez à vos billets électroniques</p>
+                                        <a href="#mes-billets" class="btn btn-outline-primary">Voir mes billets</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mes réservations -->
+                        <div id="mes-reservations" class="mb-5">
+                            <h2 class="mb-3">Mes Réservations</h2>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Référence</th>
+                                            <th>Vol</th>
+                                            <th>Date de départ</th>
+                                            <th>État</th>
+                                            <th>Prix</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="bookings">
+                                            <tr t-foreach="bookings" t-as="booking">
+                                                <td><t t-esc="booking.booking_reference"/></td>
+                                                <td><t t-esc="booking.flight_number"/> (<t t-esc="booking.airline"/>)</td>
+                                                <td>
+                                                    <t t-if="booking.departure_date">
+                                                        <t t-esc="booking.departure_date.strftime('%d/%m/%Y')"/>
+                                                        <span t-if="booking.departure_time">à <t t-esc="booking.departure_time"/></span>
+                                                    </t>
+                                                </td>
+                                                <td>
+                                                    <span t-if="booking.state == 'draft'" class="badge bg-secondary">Brouillon</span>
+                                                    <span t-if="booking.state == 'en attente de paiement'" class="badge bg-warning">En attente de paiement</span>
+                                                    <span t-if="booking.state == 'confirmed'" class="badge bg-success">Confirmée</span>
+                                                    <span t-if="booking.state == 'cancelled'" class="badge bg-danger">Annulée</span>
+                                                </td>
+                                                <td><t t-esc="booking.price"/> <t t-esc="booking.currency"/></td>
+                                                <td>
+                                                    <a t-att-href="'/my/travel/booking/%s' % booking.id" class="btn btn-sm btn-primary">Détails</a>
+                                                    <a t-if="booking.state == 'en attente de paiement'" t-att-href="'/travel/payment?booking_id=%s' % booking.id" class="btn btn-sm btn-success ms-1">Payer</a>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <tr t-if="not bookings">
+                                            <td colspan="6" class="text-center">
+                                                <div class="alert alert-info mb-0">
+                                                    Vous n'avez pas encore de réservation.
+                                                    <a href="/traveling" class="alert-link">Réserver un vol</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Mes billets -->
+                        <div id="mes-billets" class="mb-5">
+                            <h2 class="mb-3">Mes Billets</h2>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Numéro</th>
+                                            <th>Vol</th>
+                                            <th>Date</th>
+                                            <th>Type de passager</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="tickets">
+                                            <tr t-foreach="tickets" t-as="ticket">
+                                                <td><t t-esc="ticket.ticket_number or '—'"/></td>
+                                                <td>
+                                                    <t t-if="ticket.booking_id">
+                                                        <t t-esc="ticket.booking_id.flight_number"/>
+                                                        (<t t-esc="ticket.booking_id.airline"/>)
+                                                    </t>
+                                                </td>
+                                                <td>
+                                                    <t t-if="ticket.booking_id and ticket.booking_id.departure_date">
+                                                        <t t-esc="ticket.booking_id.departure_date.strftime('%d/%m/%Y')"/>
+                                                    </t>
+                                                </td>
+                                                <td>
+                                                    <span t-if="ticket.passenger_type == 'adult'" class="badge bg-primary">Adulte</span>
+                                                    <span t-if="ticket.passenger_type == 'child'" class="badge bg-info">Enfant</span>
+                                                    <span t-if="ticket.passenger_type == 'infant'" class="badge bg-warning">Bébé</span>
+                                                </td>
+                                                <td>
+                                                    <a t-att-href="'/my/travel/tickets/%s' % ticket.id" class="btn btn-sm btn-primary">Voir</a>
+                                                    <button class="btn btn-sm btn-success ms-1" onclick="window.print()">Imprimer</button>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <tr t-if="not tickets">
+                                            <td colspan="5" class="text-center">
+                                                <div class="alert alert-info mb-0">
+                                                    Vous n'avez pas encore de billet.
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Booking Details Template -->
+    <template id="my_travel_booking_details" name="My Travel Booking Details">
+        <t t-call="website.layout">
+            <div class="container mt-4 mb-5">
+                <div class="row">
+                    <div class="col-12">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/">Accueil</a></li>
+                                <li class="breadcrumb-item"><a href="/my/travel">Mon Espace Voyageur</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Détails de la réservation</li>
+                            </ol>
+                        </nav>
+
+                        <div class="card mb-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h3 class="mb-0">Réservation <t t-esc="booking.booking_reference"/></h3>
+                                <span t-if="booking.state == 'draft'" class="badge bg-secondary">Brouillon</span>
+                                <span t-if="booking.state == 'en attente de paiement'" class="badge bg-warning">En attente de paiement</span>
+                                <span t-if="booking.state == 'confirmed'" class="badge bg-success">Confirmée</span>
+                                <span t-if="booking.state == 'cancelled'" class="badge bg-danger">Annulée</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h4>Détails du vol</h4>
+                                        <dl class="row">
+                                            <dt class="col-sm-4">Numéro de vol</dt>
+                                            <dd class="col-sm-8"><t t-esc="booking.flight_number"/></dd>
+
+                                            <dt class="col-sm-4">Compagnie</dt>
+                                            <dd class="col-sm-8"><t t-esc="booking.airline or '—'"/></dd>
+
+                                            <dt class="col-sm-4">Date de départ</dt>
+                                            <dd class="col-sm-8">
+                                                <t t-if="booking.departure_date">
+                                                    <t t-esc="booking.departure_date.strftime('%d/%m/%Y')"/>
+                                                    <t t-if="booking.departure_time">à <t t-esc="booking.departure_time"/></t>
+                                                </t>
+                                            </dd>
+
+                                            <dt class="col-sm-4">Date d'arrivée</dt>
+                                            <dd class="col-sm-8">
+                                                <t t-if="booking.arrival_date">
+                                                    <t t-esc="booking.arrival_date.strftime('%d/%m/%Y')"/>
+                                                    <t t-if="booking.arrival_time">à <t t-esc="booking.arrival_time"/></t>
+                                                </t>
+                                            </dd>
+
+                                            <dt class="col-sm-4">Prix</dt>
+                                            <dd class="col-sm-8"><t t-esc="booking.price"/> <t t-esc="booking.currency"/></dd>
+                                        </dl>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <h4>Informations de contact</h4>
+                                        <dl class="row">
+                                            <dt class="col-sm-4">Nom</dt>
+                                            <dd class="col-sm-8"><t t-esc="booking.name"/></dd>
+
+                                            <dt class="col-sm-4">Email</dt>
+                                            <dd class="col-sm-8"><t t-esc="booking.email or '—'"/></dd>
+
+                                            <dt class="col-sm-4">Téléphone</dt>
+                                            <dd class="col-sm-8"><t t-esc="booking.phone or '—'"/></dd>
+
+                                            <dt class="col-sm-4">Passeport</dt>
+                                            <dd class="col-sm-8"><t t-esc="booking.passport or '—'"/></dd>
+                                        </dl>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

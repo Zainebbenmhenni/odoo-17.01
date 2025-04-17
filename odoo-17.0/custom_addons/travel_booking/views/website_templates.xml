@@ -1,0 +1,673 @@
+<odoo>
+    <template id="website_travel_search" name="Travel Search">
+        <t t-call="website.layout">
+            <style>
+                /* Palette de couleurs */
+                :root {
+                    --bleu-fonce: #0F5062;
+                    --bleu-clair: #7A8514;
+                    --blanc: #FFFFFF;
+                    --gris-clair: #E0E0E0;
+                }
+
+                /* Styles généraux */
+                body {
+                    font-family: 'Arial', sans-serif;
+                    color: var(--bleu-fonce);
+                    background-color: #f8f9fa;
+                }
+
+                h1, h2, h3, h4, h5, h6 {
+                    font-weight: bold;
+                    color: var(--bleu-fonce);
+                }
+
+                p {
+                    font-size: 1.1rem;
+                    line-height: 1.6;
+                    color: var(--bleu-fonce);
+                }
+
+                /* Form styling improvements */
+                #flight-search-form .card {
+                    max-width: 800px;
+                    margin: 0 auto;
+                    border-radius: 12px;
+                    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+                    border: none;
+                }
+
+                #flight-search-form .card-body {
+                    padding: 35px;
+                }
+
+                /* Standardize form controls */
+                .form-control, .form-select, .btn {
+                    height: 54px;
+                    font-size: 16px;
+                    transition: all 0.3s ease;
+                }
+
+                /* Input fields styling */
+                .form-control, .form-select {
+                    width: 100%;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 8px;
+                    padding: 12px 15px;
+                    margin-bottom: 20px;
+                    box-shadow: none;
+                }
+
+                .form-control:focus, .form-select:focus {
+                    border-color: var(--bleu-clair);
+                    box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.25);
+                }
+
+                /* Labels styling */
+                .form-label {
+                    font-weight: 600;
+                    margin-bottom: 10px;
+                    color: var(--bleu-fonce);
+                    display: block;
+                    font-size: 15px;
+                }
+
+                /* Button styling */
+                .btn-primary {
+                    border-radius: 8px;
+                    background-color: var(--bleu-clair);
+                    border: none;
+                    font-weight: 600;
+                    transition: all 0.3s ease;
+                    letter-spacing: 0.5px;
+                    height: 54px;
+                    text-transform: uppercase;
+                }
+
+                .btn-primary:hover {
+                    background-color: var(--bleu-fonce);
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 10px rgba(26, 35, 126, 0.3);
+                }
+
+                /* Trip type section */
+                .trip-type-section {
+                    margin-bottom: 25px;
+                }
+
+                .btn-group .btn {
+                    border-radius: 8px;
+                    padding: 12px 20px;
+                    font-weight: 600;
+                }
+
+                .btn-check + .btn-outline-primary {
+                    border-color: var(--bleu-clair);
+                    color: var(--bleu-clair);
+                }
+
+                .btn-check:checked + .btn-outline-primary {
+                    background-color: var(--bleu-clair);
+                    border-color: var(--bleu-clair);
+                    color: white;
+                }
+
+                /* Passenger count section */
+                .passengers-section {
+                    margin-bottom: 25px;
+                    background-color: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 10px;
+                }
+
+                .passengers-section .small {
+                    font-size: 14px;
+                    font-weight: 600;
+                }
+
+                .passengers-section input {
+                    text-align: center;
+                    font-weight: 600;
+                    height: 48px;
+                }
+
+                /* Section titles */
+                .section-title {
+                    color: var(--bleu-fonce);
+                    font-weight: 700;
+                    margin-bottom: 20px;
+                    font-size: 18px;
+                    border-bottom: 2px solid var(--bleu-clair);
+                    padding-bottom: 10px;
+                    display: inline-block;
+                }
+
+                /* Date input styling */
+                input[type="date"] {
+                    padding-right: 15px;
+                    height: 54px;
+                }
+
+                /* Form sections */
+                .form-section {
+                    margin-bottom: 25px;
+                }
+
+                /* Airport selects */
+                .airport-select {
+                    margin-bottom: 25px;
+                }
+
+                /* Loading spinner */
+                #loading-spinner {
+                    margin: 20px auto;
+                }
+
+                .spinner-border {
+                    width: 3rem;
+                    height: 3rem;
+                    color: var(--bleu-clair);
+                }
+
+                /* Responsive adjustments */
+                @media (max-width: 768px) {
+                    #flight-search-form .card-body {
+                        padding: 20px;
+                    }
+
+                    .form-section {
+                        margin-bottom: 15px;
+                    }
+                }
+
+                /* Hero Section and other sections styles remain unchanged */
+                #loading-spinner {
+                    margin: 20px auto;
+                }
+
+                .spinner-border {
+                    width: 3rem;
+                    height: 3rem;
+                }
+
+                /* Standardize destination images */
+                .card-img-top {
+                    height: 700px; /* Set a fixed height */
+                    object-fit: cover; /* Make images cover the area without distortion */
+                    width: 100%; /* Make sure width is consistent */
+                }
+
+                /* Specifically for destination cards */
+                .destinations .card-img-top {
+                    height: 700px; /* You can adjust this value based on your preference */
+                }
+
+                /* For the flight deals section */
+                .flight-deals .card-img-top {
+                    height: 700px; /* You can adjust this value based on your preference */
+                }
+
+                /* Section Hero */
+                .hero-section {
+                    background-image: url('/travel_booking/static/img/wp2574287.webp');
+                    background-size: cover;
+                    background-position: center;
+                    padding: 100px 0;
+                    text-align: center;
+                    color: var(--blanc);
+                }
+
+                .hero-section h1 {
+                    font-size: 3.5rem;
+                    margin-bottom: 20px;
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+                }
+
+                .hero-section .card {
+                    background-color: rgba(255, 255, 255, 0.9);
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+                }
+
+                .hero-section .form-label {
+                    font-weight: bold;
+                    color: var(--bleu-fonce);
+                }
+
+                .hero-section .btn-primary {
+                    background-color: var(--bleu-clair);
+                    border: none;
+                    padding: 10px 20px;
+                    font-size: 1.2rem;
+                    color: var(--blanc);
+                    transition: background-color 0.3s ease;
+                }
+
+                .hero-section .btn-primary:hover {
+                    background-color: var(--bleu-fonce);
+                }
+            </style>
+            <div id="wrap">
+                <!-- Hero Section with Airplane -->
+                <section class="hero position-relative bg-light py-5">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6">
+                                <h1><span class="text-primary">Book</span> Your <br/><span class="fw-bold">Dream</span> <span class="text-primary">Flights</span><br/>Now!</h1>
+                                <p class="text-muted my-4">Plan your perfect trip with us. Experience seamless booking and unforgettable journeys.</p>
+                                <a href="#booking" class="btn btn-primary px-4 py-2 mb-4">Book Now</a>
+                            </div>
+                            <div class="col-lg-6 position-relative">
+                                <img src="/travel_booking/static/img/flight.png" class="img-fluid" alt="Airplane"/>
+                                <div class="flight-path position-absolute w-100 h-100" style="top: 0; left: 0; z-index: 1;">
+                                    <!-- Flight path dotted line would be implemented with CSS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Flight Search Form -->
+                <div class="container mt-4 mb-5" id="booking">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-10">
+                            <div class="card">
+                                <div class="card-body">
+
+                                    <form id="flight-search-form" action="/travel/submit" method="POST">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <!-- Trip Type Section -->
+                                        <div class="form-section trip-type-section">
+                                            <div class="btn-group w-100" role="group">
+                                                <input type="radio" class="btn-check" name="trip_type" id="OneWay" value="OneWay" checked="checked"/>
+                                                <label class="btn btn-outline-primary" for="OneWay">Aller simple</label>
+
+                                                <input type="radio" class="btn-check" name="trip_type" id="RoundTrip" value="RoundTrip"/>
+                                                <label class="btn btn-outline-primary" for="RoundTrip">Aller-retour</label>
+
+<!--                                                <input type="radio" class="btn-check" name="trip_type" id="MultiCity" value="MultiCity"/>-->
+<!--                                                <label class="btn btn-outline-primary" for="MultiCity">Multi-destinations</label>-->
+                                            </div>
+                                        </div>
+<!--                                        &lt;!&ndash; Trip Type Section &ndash;&gt;-->
+<!--                                        <div class="form-section trip-type-section">-->
+<!--                                            <div class="btn-group w-100" role="group">-->
+<!--                                                <input type="radio" class="btn-check" name="trip_type" id="OneWay" value="OneWay" checked="checked"/>-->
+<!--                                                <label class="btn btn-outline-primary" for="OneWay">Aller simple</label>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+
+                                        <!-- Airport Selection Section -->
+                                        <div class="form-section airport-select">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="departure" class="form-label">Départ</label>
+                                                    <select id="departure" class="form-select" name="departure_id" required="required">
+                                                        <option value="">Sélectionnez un aéroport</option>
+                                                        <t t-foreach="request.env['airport'].sudo().search([])" t-as="airport">
+                                                            <option t-att-value="airport.iata">
+                                                                <t t-esc="airport.city"/> (<t t-esc="airport.iata"/>) - <t t-esc="airport.name"/>
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="destination" class="form-label">Destination</label>
+                                                    <select id="destination" class="form-select" name="destination_id" required="required">
+                                                        <option value="">Sélectionnez un aéroport</option>
+                                                        <t t-foreach="request.env['airport'].sudo().search([])" t-as="airport">
+                                                            <option t-att-value="airport.iata">
+                                                                <t t-esc="airport.city"/> (<t t-esc="airport.iata"/>) - <t t-esc="airport.name"/>
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Date and Class Selection -->
+                                        <div class="form-section">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="travel_date" class="form-label">Date du voyage</label>
+                                                    <input type="date" id="travel_date" class="form-control" name="travel_date" required="required"/>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="travel_class" class="form-label">Classe de voyage</label>
+                                                    <select id="travel_class" class="form-select" name="travel_class">
+                                                        <option value="Economy">Economy</option>
+                                                        <option value="Business">Affaires</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Ajout d'un champ pour la date de retour qui s'affiche conditionnellement -->
+                                        <div class="form-section" id="return-date-section" style="display: none;">
+                                            <div class="row">
+                                                <div class="col-md-12 mb-3">
+                                                    <label for="return_date" class="form-label">Date de retour</label>
+                                                    <input type="date" id="return_date" class="form-control" name="return_date"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Passengers Section -->
+                                        <div class="form-section">
+                                            <h4 class="section-title">Passagers</h4>
+                                            <div class="passengers-section">
+                                                <div class="row g-3">
+                                                    <div class="col-md-4">
+                                                        <label class="form-label small">Adultes</label>
+                                                        <input type="number" class="form-control" name="adult_count" value="1" min="1"/>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label small">Enfants</label>
+                                                        <input type="number" class="form-control" name="child_count" value="0" min="0"/>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label small">Bébés</label>
+                                                        <input type="number" class="form-control" name="infant_count" value="0" min="0"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Submit Button -->
+                                        <div class="mt-4">
+                                            <button type="submit" class="btn btn-primary w-100" id="search-flights-btn">Voir les vols disponibles</button>
+                                            <div id="loading-spinner" class="text-center mt-3" style="display: none;">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Chargement...</span>
+                                                </div>
+                                                <p class="mt-2">Recherche des vols en cours...</p>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Services Section -->
+                <section class="services-section py-4">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card shadow-sm p-3 mb-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="icon-circle bg-primary-light rounded-circle p-3 me-3">
+                                            <i class="fa fa-comments text-primary fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1">We are Now Available</h5>
+                                            <p class="text-muted mb-0">Call +1 555 666 888 contact with us</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card shadow-sm p-3 mb-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="icon-circle bg-primary-light rounded-circle p-3 me-3">
+                                            <i class="fa fa-plane text-primary fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1">International Flight</h5>
+                                            <p class="text-muted mb-0">Call +1 555 666 888 contact with us</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card shadow-sm p-3 mb-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="icon-circle bg-primary-light rounded-circle p-3 me-3">
+                                            <i class="fa fa-dollar-sign text-primary fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1">Check Refund</h5>
+                                            <p class="text-muted mb-0">Call +1 555 666 888 contact with us</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Latest Flight Deals -->
+                <section class="flight-deals py-5">
+                    <div class="container">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="mb-0">Latest Flight Deals</h2>
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="fa fa-chevron-left"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fa fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card shadow-sm mb-4">
+                                    <img src="/travel_booking/static/img/dubai2.jpg" class="card-img-top" alt="Maldives"/>
+                                    <div class="card-body">
+                                        <h5 class="card-title">Dubai to Maldives</h5>
+                                        <p class="card-text text-muted">14 Aug, 2023 - 20 Aug 2023</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <p class="mb-0 text-muted">Business Class</p>
+                                                <h5 class="mb-0">$980</h5>
+                                            </div>
+                                            <a href="#booking" class="btn btn-primary px-4 py-2 mb-4">Book Now</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card shadow-sm mb-4">
+                                    <img src="/travel_booking/static/img/canada2.jpg" class="card-img-top" alt="Canada"/>
+                                    <div class="card-body">
+                                        <h5 class="card-title">Dubai to Canada</h5>
+                                        <p class="card-text text-muted">14 Aug, 2023 - 20 Aug 2023</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <p class="mb-0 text-muted">First Class</p>
+                                                <h5 class="mb-0">$5000</h5>
+                                            </div>
+                                           <a href="#booking" class="btn btn-primary px-4 py-2 mb-4">Book Now</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card shadow-sm mb-4">
+                                    <img src="/travel_booking/static/img/dhaka.jpg" class="card-img-top" alt="Dhaka"/>
+                                    <div class="card-body">
+                                        <h5 class="card-title">Dubai to Dhaka</h5>
+                                        <p class="card-text text-muted">14 Aug, 2023 - 20 Aug 2023</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <p class="mb-0 text-muted">Economy Class</p>
+                                                <h5 class="mb-0">$400</h5>
+                                            </div>
+                                            <a href="#booking" class="btn btn-primary px-4 py-2 mb-4">Book Now</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Travel Destinations -->
+                <section class="destinations py-5 bg-light">
+                    <div class="container">
+                        <div class="text-center mb-5">
+                            <img src="/travel_booking/static/img/Fly.png" class="img-fluid mb-3" alt="FlyNow Logo" style="max-width: 150px;"/>
+                            <h2 class="display-5">TRAVEL <span class="bg-dark text-white px-2">ALL</span> <span class="bg-dark text-white px-2">OVER</span></h2>
+                            <h2 class="display-5"><span class="bg-light text-primary px-2">The</span></h2>
+                            <h2 class="display-5"><span class="bg-light text-primary px-2">WORLD</span></h2>
+                            <div class="mt-3">
+                                <a href="#booking" class="btn btn-primary px-4 py-2 mb-4">Book Now</a>
+                            </div>
+                        </div>
+                        <div class="position-relative">
+                            <div class="row justify-content-center">
+                                <div class="col-md-6 text-center">
+                                    <div class="card shadow-lg mb-4">
+                                        <img src="/travel_booking/static/img/dubai2.jpg" class="card-img-top" alt="Dubai"/>
+                                        <div class="card-body">
+                                            <h3>Dubai</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card shadow mb-4">
+                                        <img src="/travel_booking/static/img/paris.jpg" class="card-img-top" alt="Paris"/>
+                                        <div class="card-body">
+                                            <h5>Paris</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card shadow mb-4">
+                                        <img src="/travel_booking/static/img/italyy.jpg" class="card-img-top" alt="Italy"/>
+                                        <div class="card-body">
+                                            <h5>Italy</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Statistics and CTA -->
+                <section class="stats-section py-5">
+                    <div class="container">
+                        <div class="card shadow-sm">
+                            <div class="card-body p-4">
+                                <div class="row align-items-center">
+                                    <div class="col-lg-6">
+                                        <p class="text-primary mb-2">Achievement</p>
+                                        <h2 class="mb-3">Your Destination Awaits, Book Now</h2>
+                                        <p class="text-muted mb-4">Join thousands of satisfied travelers who have discovered their dream destinations with FlyNow.</p>
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="icon-circle bg-primary-light rounded-circle p-3 me-3">
+                                                        <i class="fa fa-users text-primary fa-lg"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h3 class="text-primary mb-0">12870+</h3>
+                                                        <p class="mb-0">Happy Customers</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="icon-circle bg-primary-light rounded-circle p-3 me-3">
+                                                        <i class="fa fa-check-circle text-primary fa-lg"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h3 class="text-primary mb-0">100%</h3>
+                                                        <p class="mb-0">Client Satisfied</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <p class="mb-0 me-3">Let's Connect Reach Out for More Information</p>
+                                            <a href="#" class="btn btn-primary">Contact us</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <img src="/travel_booking/static/img/images1234.jpg" class="img-fluid rounded" alt="Passenger"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Latest News -->
+                <section class="news-section py-5">
+                    <div class="container">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="mb-0">Our Latest News</h2>
+                            <a href="#" class="btn btn-primary">Show More</a>
+                        </div>
+                        <!-- News content would go here -->
+                    </div>
+                </section>
+
+                <!-- Script pour le spinner de chargement -->
+                <script type="text/javascript">
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var form = document.getElementById('flight-search-form');
+                        if (form) {
+                            form.addEventListener('submit', function(event) {
+                                // Vérifier si le formulaire est valide
+                                if (form.checkValidity()) {
+                                    // Afficher le spinner de chargement
+                                    document.getElementById('loading-spinner').style.display = 'block';
+                                    // Désactiver le bouton
+                                    document.getElementById('search-flights-btn').disabled = true;
+                                    return true;
+                                } else {
+                                    // Empêcher la soumission si le formulaire n'est pas valide
+                                    event.preventDefault();
+                                    return false;
+                                }
+                            });
+                        }
+                    });
+                </script>
+                <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fonction pour mettre à jour la visibilité de la date de retour
+        function updateReturnDateVisibility() {
+            const tripType = document.querySelector('input[name="trip_type"]:checked')?.value;
+            const returnDateSection = document.getElementById('return-date-section');
+            const returnDateInput = document.getElementById('return_date');
+
+            if (tripType === 'RoundTrip') {
+                returnDateSection.style.display = 'block';
+                returnDateInput.required = true;
+            } else {
+                returnDateSection.style.display = 'none';
+                returnDateInput.required = false;
+            }
+        }
+
+        // Initialiser l'état au chargement
+        updateReturnDateVisibility();
+
+        // Ajouter des écouteurs d'événements pour les changements de type de voyage
+        const tripTypeInputs = document.querySelectorAll('input[name="trip_type"]');
+        tripTypeInputs.forEach(input => {
+            input.addEventListener('change', updateReturnDateVisibility);
+        });
+
+        // Gérer le formulaire
+        const form = document.getElementById('flight-search-form');
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                if (this.checkValidity()) {
+                    document.getElementById('loading-spinner').style.display = 'block';
+                }
+            });
+        }
+    });
+</script>
+            </div>
+        </t>
+    </template>
+</odoo>

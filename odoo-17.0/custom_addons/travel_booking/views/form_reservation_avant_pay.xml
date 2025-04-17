@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="flight_booking_form" name="Flight Booking Form">
+        <t t-call="website.layout">
+            <!-- Styles CSS conservés... -->
+            <div class="container mt-4">
+                <div class="row">
+                    <div class="col-12">
+                        <h2>Réservation de vol</h2>
+
+                        <!-- Résumé du vol sélectionné -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Détails du vol</h5>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <strong>Compagnie:</strong> <span t-esc="airline"/>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Vol:</strong> <span t-esc="flight_number"/>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Prix:</strong> <span t-esc="price"/> <span t-esc="currency"/>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Bagages:</strong> <span t-esc="baggage"/>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Passagers:</strong> <span t-esc="total_passengers"/>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Adultes:</strong> <span t-esc="adult_count"/>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Enfants:</strong> <span t-esc="child_count"/>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Bébés:</strong> <span t-esc="infant_count"/>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <strong>Départ:</strong> <span t-esc="departure_date"/> à <span t-esc="departure_time"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Arrivée:</strong> <span t-esc="arrival_date"/> à <span t-esc="arrival_time"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Condition pour vérifier si l'utilisateur est connecté -->
+                    <t t-if="is_logged_in">
+                        <form t-attf-action="/travel/booking/confirm" method="post" class="o_website_form">
+                            <!-- Champs cachés pour les données du vol -->
+                            <input type="hidden" name="passengers" t-att-value="total_passengers"/>
+                            <input type="hidden" name="adult_count" t-att-value="adult_count"/>
+                            <input type="hidden" name="child_count" t-att-value="child_count"/>
+                            <input type="hidden" name="infant_count" t-att-value="infant_count"/>
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="flight_number" t-att-value="flight_number"/>
+                            <input type="hidden" name="departure_date" t-att-value="departure_date"/>
+                            <input type="hidden" name="departure_time" t-att-value="departure_time"/>
+                            <input type="hidden" name="arrival_date" t-att-value="arrival_date"/>
+                            <input type="hidden" name="arrival_time" t-att-value="arrival_time"/>
+                            <input type="hidden" name="airline" t-att-value="airline"/>
+                            <input type="hidden" name="price" t-att-value="price"/>
+                            <input type="hidden" name="currency" t-att-value="currency"/>
+
+                            <!-- Section pour les passagers adultes avec le premier adulte comme contact principal -->
+                            <t t-if="adult_count > 0">
+                                <div class="card mb-4">
+                                    <div class="card-header bg-primary text-white">
+                                        <h4>Contact principal et premier passager</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="passenger-form mb-4">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label" for="adult_name_1">Nom complet *</label>
+                    <input type="text" class="form-control" name="adult_name_1" required="1"
+                           t-att-value="partner.name if is_logged_in else ''"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="adult_passport_1">Numéro de passeport *</label>
+                    <input type="text" class="form-control" name="adult_passport_1" required="1"
+                           t-att-value="partner.passport_number if is_logged_in else ''"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="email">Email *</label>
+                    <input type="email" class="form-control" name="email" required="1"
+                           t-att-value="partner.email if is_logged_in else ''"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="phone">Téléphone *</label>
+                    <input type="tel" class="form-control" name="phone" required="1"
+                           t-att-value="partner.phone if is_logged_in else ''"/>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label" for="adult_birth_date_1">Date de naissance *</label>
+                    <input type="date" class="form-control" name="adult_birth_date_1" required="1"
+                           t-att-value="partner.birth_date if is_logged_in else ''"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="adult_gender_1">Genre *</label>
+                    <select class="form-select" name="adult_gender_1" required="1">
+                        <option value="M" t-att-selected="partner.gender == 'M' if is_logged_in else None">Masculin</option>
+                        <option value="F" t-att-selected="partner.gender == 'F' if is_logged_in else None">Féminin</option>
+                    </select>
+                </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="adult_seat_1">Préférence de siège</label>
+                                                        <select class="form-select" name="adult_seat_1">
+                                                            <option value="window">Hublot</option>
+                                                            <option value="aisle">Couloir</option>
+                                                            <option value="middle">Milieu</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="adult_meal_1">Préférence de repas</label>
+                                                        <select class="form-select" name="adult_meal_1">
+                                                            <option value="regular">Standard</option>
+                                                            <option value="vegetarian">Végétarien</option>
+                                                            <option value="halal">Halal</option>
+                                                            <option value="kosher">Casher</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Autres adultes (si plus d'un adulte) -->
+                                <t t-if="adult_count > 1">
+                                    <div class="card mb-4">
+                                        <div class="card-header">
+                                            <h4>Autres passagers adultes</h4>
+                                        </div>
+                                        <div class="card-body">
+                                            <t t-foreach="range(2, adult_count + 1)" t-as="i">
+                                                <div class="passenger-form mb-4">
+                                                    <h5>Adulte <t t-esc="i"/></h5>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label" t-attf-for="adult_name_{{i}}">Nom complet *</label>
+                                                                <input type="text" class="form-control" t-attf-name="adult_name_{{i}}" required="1"/>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label" t-attf-for="adult_passport_{{i}}">Numéro de passeport *</label>
+                                                                <input type="text" class="form-control" t-attf-name="adult_passport_{{i}}" required="1"/>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label" t-attf-for="adult_phone_{{i}}">Téléphone *</label>
+                                                                <input type="tel" class="form-control" t-attf-name="adult_phone_{{i}}" required="1"/>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label" t-attf-for="adult_birth_date_{{i}}">Date de naissance *</label>
+                                                                <input type="date" class="form-control" t-attf-name="adult_birth_date_{{i}}" required="1"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label" t-attf-for="adult_gender_{{i}}">Genre *</label>
+                                                                <select class="form-select" t-attf-name="adult_gender_{{i}}" required="1">
+                                                                    <option value="M">Masculin</option>
+                                                                    <option value="F">Féminin</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label" t-attf-for="adult_seat_{{i}}">Préférence de siège</label>
+                                                                <select class="form-select" t-attf-name="adult_seat_{{i}}">
+                                                                    <option value="window">Hublot</option>
+                                                                    <option value="aisle">Couloir</option>
+                                                                    <option value="middle">Milieu</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label" t-attf-for="adult_meal_{{i}}">Préférence de repas</label>
+                                                                <select class="form-select" t-attf-name="adult_meal_{{i}}">
+                                                                    <option value="regular">Standard</option>
+                                                                    <option value="vegetarian">Végétarien</option>
+                                                                    <option value="halal">Halal</option>
+                                                                    <option value="kosher">Casher</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </t>
+                            </t>
+
+                            <!-- Section dynamique pour les enfants -->
+                            <t t-if="child_count > 0">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h4>Enfants (2-12 ans)</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <t t-foreach="range(1, child_count + 1)" t-as="i">
+                                            <div class="passenger-form mb-4">
+                                                <h5>Enfant <t t-esc="i"/></h5>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="mb-3">
+                                                            <label class="form-label" t-attf-for="child_name_{{i}}">Nom complet *</label>
+                                                            <input type="text" class="form-control" t-attf-name="child_name_{{i}}" required="1"/>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label" t-attf-for="child_passport_{{i}}">Numéro de passeport *</label>
+                                                            <input type="text" class="form-control" t-attf-name="child_passport_{{i}}" required="1"/>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label" t-attf-for="child_birth_date_{{i}}">Date de naissance *</label>
+                                                            <input type="date" class="form-control" t-attf-name="child_birth_date_{{i}}" required="1"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="mb-3">
+                                                            <label class="form-label" t-attf-for="child_gender_{{i}}">Genre *</label>
+                                                            <select class="form-select" t-attf-name="child_gender_{{i}}" required="1">
+                                                                <option value="M">Masculin</option>
+                                                                <option value="F">Féminin</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label" t-attf-for="child_seat_{{i}}">Préférence de siège</label>
+                                                            <select class="form-select" t-attf-name="child_seat_{{i}}">
+                                                                <option value="window">Hublot</option>
+                                                                <option value="aisle">Couloir</option>
+                                                                <option value="middle">Milieu</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label" t-attf-for="child_meal_{{i}}">Préférence de repas</label>
+                                                            <select class="form-select" t-attf-name="child_meal_{{i}}">
+                                                                <option value="regular">Standard</option>
+                                                                <option value="kids">Menu enfant</option>
+                                                                <option value="vegetarian">Végétarien</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+
+                            <!-- Section dynamique pour les bébés -->
+                            <t t-if="infant_count > 0">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h4>Bébés (moins de 2 ans)</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <t t-foreach="range(1, infant_count + 1)" t-as="i">
+                                            <div class="passenger-form mb-4">
+                                                <h5>Bébé <t t-esc="i"/></h5>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="mb-3">
+                                                            <label class="form-label" t-attf-for="infant_name_{{i}}">Nom complet *</label>
+                                                            <input type="text" class="form-control" t-attf-name="infant_name_{{i}}" required="1"/>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label" t-attf-for="infant_passport_{{i}}">Numéro de passeport *</label>
+                                                            <input type="text" class="form-control" t-attf-name="infant_passport_{{i}}" required="1"/>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label" t-attf-for="infant_birth_date_{{i}}">Date de naissance *</label>
+                                                            <input type="date" class="form-control" t-attf-name="infant_birth_date_{{i}}" required="1"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="mb-3">
+                                                            <label class="form-label" t-attf-for="infant_gender_{{i}}">Genre *</label>
+                                                            <select class="form-select" t-attf-name="infant_gender_{{i}}" required="1">
+                                                                <option value="M">Masculin</option>
+                                                                <option value="F">Féminin</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label" t-attf-for="infant_seat_{{i}}">Préférence de siège</label>
+                                                            <select class="form-select" t-attf-name="infant_seat_{{i}}">
+                                                                <option value="with_parent">Avec parent</option>
+
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label" t-attf-for="infant_meal_{{i}}">Préférence de repas</label>
+                                                            <select class="form-select" t-attf-name="infant_meal_{{i}}">
+                                                                <option value="baby">Repas bébé</option>
+                                                                <option value="none">Aucun</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary" name="submit_to_payment">Confirmer et procéder au paiement</button>
+                                <a href="/travel/search/results" class="btn btn-secondary ms-2">Retour aux résultats</a>
+                            </div>
+                        </form>
+                    </t>
+                        <t t-else="">
+                        <!-- Message et bouton pour les utilisateurs non connectés -->
+                        <div class="alert alert-info">
+                            <h4>Connexion nécessaire</h4>
+                            <p>Pour continuer votre réservation, veuillez vous connecter à votre compte ou en créer un nouveau.</p>
+                            <div class="mt-3">
+                                <a href="/travel/signin?redirect=booking" class="btn btn-primary">Se connecter pour continuer</a>
+                                <a href="/travel/signup" class="btn btn-outline-secondary ml-2">Créer un compte</a>
+                            </div>
+                        </div>
+                    </t>
+                    </div>
+                </div>
+
+                <!-- Statistics and CTA section conservé... -->
+                <section class="stats-section py-5">
+                    <div class="container">
+                        <div class="card shadow-sm">
+                            <div class="card-body p-4">
+                                <div class="row align-items-center">
+                                    <div class="col-lg-6">
+                                        <p class="text-primary mb-2">Achievement</p>
+                                        <h2 class="mb-3">Your Destination Awaits, Book Now</h2>
+                                        <p class="text-muted mb-4">Join thousands of satisfied travelers who have discovered their dream destinations with FlyNow.</p>
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="icon-circle bg-primary-light rounded-circle p-3 me-3">
+                                                        <i class="fa fa-users text-primary fa-lg"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h3 class="text-primary mb-0">12870+</h3>
+                                                        <p class="mb-0">Happy Customers</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="icon-circle bg-primary-light rounded-circle p-3 me-3">
+                                                        <i class="fa fa-check-circle text-primary fa-lg"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h3 class="text-primary mb-0">100%</h3>
+                                                        <p class="mb-0">Client Satisfied</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <p class="mb-0 me-3">Let's Connect Reach Out for More Information</p>
+                                            <a href="#" class="btn btn-primary">Contact us</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <img src="/travel_booking/static/img/images1234.jpg" class="img-fluid rounded" alt="Passenger"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+</odoo>
