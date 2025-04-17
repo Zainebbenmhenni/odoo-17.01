@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Séquence pour les numéros de ticket -->
+        <record id="booking_ticket_sequence" model="ir.sequence">
+            <field name="name">Séquence de tickets</field>
+            <field name="code">booking.ticket.sequence</field>
+            <field name="prefix">TKN</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

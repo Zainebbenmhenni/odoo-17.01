@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Dashboard View -->
+        <record id="view_booking_dashboard" model="ir.ui.view">
+            <field name="name">booking.dashboard</field>
+            <field name="model">booking</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <dashboard>
+                        <view_mode name="graph"/>
+
+                        <group>
+                            <aggregate name="total_bookings"
+                                field="id"
+                                string="Total Bookings"
+                                domain="[]"/>
+
+                            <aggregate name="confirmed_bookings"
+                                field="id"
+                                string="Confirmed Bookings"
+                                domain="[('state', '=', 'confirmed')]"/>
+
+                            <aggregate name="pending_bookings"
+                                field="id"
+                                string="Pending Bookings"
+                                domain="[('state', '=', 'en attente de paiement')]"/>
+
+                            <aggregate name="total_revenue"
+                                field="price"
+                                string="Total Revenue"
+                                domain="[]"/>
+                        </group>
+
+                        <view_mode name="graph">
+                            <graph type="bar" stacked="True">
+                                <field name="airline" type="row"/>
+                                <field name="state" type="measure"/>
+                            </graph>
+
+                            <graph type="pie">
+                                <field name="gender" type="measure"/>
+                            </graph>
+                        </view_mode>
+
+                        <view_mode name="pivot"/>
+                    </dashboard>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action for Dashboard -->
+        <record id="action_booking_dashboard" model="ir.actions.act_window">
+            <field name="name">Booking Dashboard</field>
+            <field name="res_model">booking</field>
+            <field name="view_mode">dashboard,tree,form,calendar</field>
+            <field name="view_id" ref="view_booking_dashboard"/>
+            <field name="context">{'search_default_draft': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Welcome to the Booking Dashboard
+                </p>
+            </field>
+        </record>
+        <menuitem id="menu_booking_dashboard"
+                  name="Dashboard"
+                  parent="menu_travel_root"
+                  action="action_booking_dashboard"
+                  sequence="1"/>
+    </data>
+</odoo>

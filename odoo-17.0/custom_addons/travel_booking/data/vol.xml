@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Création du produit Vol -->
+        <record id="product_flight" model="product.product">
+            <field name="name">Billet d'avion</field>
+            <field name="type">service</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">False</field>
+            <field name="list_price">0.0</field>
+            <field name="default_code">VOL</field>
+        </record>
+    </data>
+</odoo>

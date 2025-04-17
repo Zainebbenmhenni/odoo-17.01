@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="travel_signin_template" name="Travel Signin">
+        <t t-call="website.layout">
+            <div class="container mt-5 mb-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-5">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h3 class="mb-0">Connexion</h3>
+                            </div>
+                            <div class="card-body">
+                                <form method="post" action="/travel/do_signin">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <!-- Ajouter un champ caché pour le paramètre de redirection -->
+                                    <input type="hidden" name="redirect" t-att-value="redirect if redirect else ''"/>
+
+                                    <!-- Error messages -->
+                                    <div t-if="error_message" class="alert alert-danger">
+                                        <ul t-foreach="error_message or []" t-as="err">
+                                            <li t-esc="err"/>
+                                        </ul>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label for="login">Email</label>
+                                        <input type="email" class="form-control" name="login" id="login" required="required"
+                                               t-att-value="login if login else ''"/>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label for="password">Mot de passe</label>
+                                        <input type="password" class="form-control" name="password" id="password" required="required"/>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg">Se connecter</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="card-footer text-center">
+                                <p class="mb-0">Vous n'avez pas de compte? <a href="/travel/signup">S'inscrire</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

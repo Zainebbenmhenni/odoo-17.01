@@ -1,0 +1,68 @@
+.travel-search-form {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+}
+
+.select2-container {
+    width: 100% !important;
+    margin-bottom: 1rem;
+}
+
+.select2-container--default .select2-selection--single {
+    height: 38px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 36px;
+    padding-left: 12px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 36px;
+}
+
+.airport-result {
+    padding: 8px;
+}
+
+.airport-name {
+    font-weight: bold;
+    color: #333;
+}
+
+.airport-info {
+    font-size: 0.875rem;
+    color: #666;
+    margin-top: 2px;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #007bff;
+    color: white;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: #e9ecef;
+}
+@media (max-width: 768px) {
+    .travel-search-form {
+        padding: 0.5rem;
+    }
+}
+.search-results .card {
+    transition: transform 0.2s;
+    margin-bottom: 20px;
+}
+
+.search-results .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.search-results .card-img-top {
+    height: 200px;
+    object-fit: cover;
+}

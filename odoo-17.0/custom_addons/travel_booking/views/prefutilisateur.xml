@@ -1,0 +1,70 @@
+<odoo>
+    <data>
+        <!-- Form View -->
+        <record id="view_user_flight_preference_form" model="ir.ui.view">
+            <field name="name">user.flight.preference.form</field>
+            <field name="model">user.flight.preference</field>
+            <field name="arch" type="xml">
+                <form string="Préférences de vol">
+                    <sheet>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="last_update" readonly="1"/>
+                        </group>
+                        <notebook>
+                            <page string="Préférences explicites">
+                                <group>
+                                    <field name="preferred_airlines" widget="many2many_tags"/>
+                                    <field name="preferred_travel_class"/>
+                                    <field name="preferred_departure_time"/>
+                                    <field name="price_sensitivity"/>
+                                </group>
+                            </page>
+                            <page string="Données d'historique" groups="base.group_system">
+                                <group>
+                                    <field name="airline_history" invisible="1"/>
+                                    <field name="time_history" invisible="1"/>
+                                    <field name="price_history" invisible="1"/>
+                                    <field name="preference_model" invisible="1"/>
+                                </group>
+                                <button name="_compute_implicit_preferences"
+                                        string="Recalculer les préférences"
+                                        type="object"
+                                        class="oe_highlight"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View -->
+        <record id="view_user_flight_preference_tree" model="ir.ui.view">
+            <field name="name">user.flight.preference.tree</field>
+            <field name="model">user.flight.preference</field>
+            <field name="arch" type="xml">
+                <tree string="Préférences de vol">
+                    <field name="partner_id"/>
+                    <field name="preferred_travel_class"/>
+                    <field name="preferred_departure_time"/>
+                    <field name="price_sensitivity"/>
+                    <field name="last_update"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_user_flight_preference" model="ir.actions.act_window">
+            <field name="name">Préférences de vol</field>
+            <field name="res_model">user.flight.preference</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Menu -->
+        <menuitem id="menu_user_flight_preference"
+                  name="Préférences de vol"
+                  parent="menu_travel_root"
+                  action="action_user_flight_preference"
+                  sequence="25"/>
+    </data>
+</odoo>

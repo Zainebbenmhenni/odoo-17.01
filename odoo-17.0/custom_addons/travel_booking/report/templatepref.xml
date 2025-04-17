@@ -1,0 +1,29 @@
+<odoo>
+    <template id="user_preference_report_template">
+        <t t-call="web.html_container">
+            <t t-foreach="data" t-as="pref">
+                <div class="page">
+                    <h2>Profil de préférences: <t t-esc="pref['partner']"/></h2>
+
+                    <div t-if="pref.get('error')" class="alert alert-danger">
+                        <p>Erreur lors de la génération du rapport: <t t-esc="pref['error']"/></p>
+                    </div>
+
+                    <div t-if="pref['charts'].get('airlines')" class="mt-4">
+                        <h3>Compagnies aériennes préférées</h3>
+                        <img t-att-src="'data:image/png;base64,' + pref['charts']['airlines']" style="max-width: 100%"/>
+                    </div>
+
+                    <div t-if="pref['charts'].get('times')" class="mt-4">
+                        <h3>Horaires préférés</h3>
+                        <img t-att-src="'data:image/png;base64,' + pref['charts']['times']" style="max-width: 100%"/>
+                    </div>
+
+                    <div class="mt-4" t-if="not pref['charts']">
+                        <p>Pas assez de données pour générer des graphiques</p>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
